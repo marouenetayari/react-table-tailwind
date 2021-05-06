@@ -13,7 +13,7 @@ const newPerson = () => {
     return {
         firstName: namor.generate({ words: 1, numbers: 0 }),
         lastName: namor.generate({ words: 1, numbers: 0 }),
-        age: Math.floor(Math.random() * 30),
+        age: Math.floor(Math.random() * 100),
         visits: Math.floor(Math.random() * 100),
         progress: Math.floor(Math.random() * 100),
         status:
@@ -22,6 +22,11 @@ const newPerson = () => {
                 : statusChance > 0.33
                 ? 'complicated'
                 : 'single',
+        col_1: Math.floor(Math.random() * 100),
+        col_2: namor.generate({ words: 1, numbers: 0 }),
+        col_3: namor.generate({ words: 1, numbers: 0 }),
+        col_4: namor.generate({ words: 1, numbers: 0 }),
+        col_5: namor.generate({ words: 1, numbers: 0 }),
     }
 }
 
