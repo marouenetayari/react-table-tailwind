@@ -9,19 +9,23 @@
     "@testing-library/user-event": "^12.1.10",
     "classnames": "^2.3.1",
     "lodash": "^4.17.21",
+    "postcss": "^8.2.13",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-feather": "^2.0.9",
+    "react-icons": "^4.2.0",
     "react-scripts": "4.0.3",
     "react-table": "^7.7.0",
     "typescript": "^4.2.4",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "yarn watch:css && react-scripts start",
+    "build": "yarn build:css && react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build:css": "postcss src/assets/tailwind.css -o src/assets/main.css",
+    "watch:css": "postcss src/assets/tailwind.css -o src/assets/main.css"
   },
   "eslintConfig": {
     "extends": [
@@ -45,6 +49,9 @@
     "@types/lodash": "^4.14.168",
     "@types/react": "^17.0.3",
     "@types/react-table": "^7.0.29",
-    "namor": "^2.0.2"
+    "autoprefixer": "^10.2.5",
+    "namor": "^2.0.2",
+    "postcss-cli": "^8.3.1",
+    "tailwindcss": "^2.1.2"
   }
 }
