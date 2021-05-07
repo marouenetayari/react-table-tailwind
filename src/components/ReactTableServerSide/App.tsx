@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import makeData from "./makeData";
 import TableServerSide from './Table'
-import { MdNewReleases } from "react-icons/md";
 
-const serverData = makeData(100);
+const serverData = makeData(500);
 const endPoitUrl = 'https://api.instantwebtools.net/v1/passenger'
+/**
+ * Call EndPoint handler
+ * @param pageSize
+ * @param pageIndex
+ * @param sortBy
+ */
 const handleEndPoit = (pageSize = 20, pageIndex = 0, sortBy = '[]') => {
     fetch(`${endPoitUrl}?page=${pageIndex}&size=${pageSize}`)
         .then(response => response.json())
@@ -12,8 +17,16 @@ const handleEndPoit = (pageSize = 20, pageIndex = 0, sortBy = '[]') => {
             console.log(data) // here I get 500000 items
         )
 }
+
 export default function AppServerSide() {
+
+
     const [data, setData] = useState([]);
+    const [footerData, setFooterData] = useState({
+        rowStyle: 'bg-blue-300 text-sm font-bold',
+        colStyle: 'p-2',
+        data: [<span className={'text-white'}>Total</span>, '-', '-', '-', '-', '-', '1000€', '500€', '800€', '1200€', '300€']
+    });
     const [loading, setLoading] = React.useState(false);
     const [pageCount, setPageCount] = React.useState(0);
     const fetchIdRef = React.useRef(0);
@@ -26,7 +39,7 @@ export default function AppServerSide() {
     }
 
     const columns =
-        // React.useMemo(() =>
+        React.useMemo(() =>
             [
                 {
                     Header: "First Name",
@@ -35,8 +48,10 @@ export default function AppServerSide() {
                 },
                 {
                     Header: "Last Name",
-                    id: "lastName",
-                    accessor: (d:any) => d.lastName,
+                    accessor: "lastName",
+                    Footer: (<span>
+                            <strong>Longest:</strong>{" "}
+                        </span>),
                     width: 50,
                 },
                 {
@@ -108,7 +123,7 @@ export default function AppServerSide() {
                     // align: 'right',
                 }
             ]
-// ,[])
+,[])
 
     /**
      * OnRowClick Function
@@ -121,13 +136,13 @@ export default function AppServerSide() {
     /**
      * Fetch Data
      */
-    const fetchData = React.useCallback(({ pageSize, pageIndex, sortBy }) => {
+    const fetchData = React.useCallback(({ pageSize, pageIndex, sortBy, withPagination }) => {
         // This will get called when the table needs new data
         // You could fetch your data from literally anywhere,
         // even a server. But for this example, we'll just fake it.
 
 
-        // console.log(`page size : ${pageSize}, pageIndex : ${pageIndex} et SortedBy : ${sortBy}`)
+        console.log(`withPagination : ${withPagination} page size : ${pageSize}, pageIndex : ${pageIndex} et SortedBy : ${sortBy}`)
         // console.log(sortBy)
         // handleEndPoit(pageSize, pageIndex, sortBy)
 
@@ -141,8 +156,8 @@ export default function AppServerSide() {
         setTimeout(() => {
             // Only update the data if this is the latest fetch
             if (fetchId === fetchIdRef.current) {
-                const startRow = pageSize * pageIndex;
-                const endRow = startRow + pageSize;
+                const startRow = (withPagination) ? pageSize * pageIndex : 0;
+                const endRow = (withPagination) ? startRow + pageSize : serverData.length;
                 if (sortBy.length === 0) {
                     setData(serverData.sort().slice(startRow, endRow));
                 } else {
@@ -175,11 +190,15 @@ export default function AppServerSide() {
     return (
         <React.Fragment>
             <TableServerSide
+                // ref={sortIdRef}
                 columns={columns}
                 data={data}
                 fetchData={fetchData}
                 loading={loading}
                 pageCount={pageCount}
+                // withPagination={false}
+                footerData={footerData}
+                rowPerPage={[25, 50, 100]}
                 handleRowClick={handleRowClick}
                 manual // informs React Table that you'll be handling sorting and pagination server-side
             />

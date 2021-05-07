@@ -1,53 +1,47 @@
 import React, {ReactElement, useEffect} from 'react'
 // import { MdKeyboardArrowUp, MdKeyboardArrowDown, } from 'react-icons/md'
-import { MdArrowDropUp, MdArrowDropDown } from "react-icons/md"
+import { MdArrowDropUp, MdArrowDropDown, MdFirstPage, MdLastPage, MdChevronLeft, MdChevronRight } from "react-icons/md"
 import {Column, usePagination, useSortBy, useTable} from "react-table";
 import { styles } from './TableStyles'
 
-interface TableProps<T extends object> {
-    columns: Column<T>[];
-    data: T[];
-
-    onSort?:any,
-    fetchData?:any,
-    loading?:boolean,
-    pageCount?: any,
-    manual?:any,
-
-    filters?: string[]; // columns names to filter
-    filter?: string[]; // Filter text
-    handleRowClick?: any
-
+type footerDataType = {
+    rowStyle: string,
+    colStyle: string,
+    data: any[]
 }
 
-export default function TableServerSide<T extends { id: string }>({
-                                                columns,
-                                                data,
-                                                onSort,
-                                                fetchData,
-                                                loading,
-                                                pageCount: controlledPageCount,
-                                                manual,
-                                                filters,
-                                                filter,
-                                                handleRowClick
-                                            }: TableProps<T>): ReactElement {
+interface TableProps<T extends object> {
+    columns: Column<T>[];
+    data?: T[];
 
-    const defaultColumn = React.useMemo(
-        () => ({
-            minWidth: 30,
-            width: 150,
-            maxWidth: 400,
-        }),
-        []
-    )
+    fetchData?:any,
+    loading?:boolean,
+    withPagination?:boolean,
+    pageCount?: any,
+    rowPerPage?: number[],
+    footerData?: footerDataType,
+    handleRowClick?: any,
+    manual?:any,
+}
 
+export default function TableServerSide<T extends { id: string }>(props: TableProps<T>): ReactElement {
+
+    const {
+        columns,
+        data,
+        fetchData,
+        loading,
+        withPagination = true,
+        pageCount: controlledPageCount,
+        rowPerPage = [10, 20, 30, 40, 50],
+        handleRowClick,
+        footerData,
+    } = props;
 
     const {
         getTableProps,
         getTableBodyProps,
         headerGroups,
-        rows,
         prepareRow,
         page,
         canPreviousPage,
@@ -74,15 +68,14 @@ export default function TableServerSide<T extends { id: string }>({
             // autoResetPage: false,
             // autoResetSortBy: false,
             autoResetHiddenColumns: true,
-            autoResetSortBy:true
-            // defaultColumn
+            autoResetSortBy:true,
         },
         useSortBy,
         usePagination
     );
 
     useEffect(() => {
-        fetchData({ pageIndex, pageSize, sortBy });
+        fetchData({ pageIndex, pageSize, sortBy, withPagination });
     }, [sortBy, fetchData, pageIndex, pageSize]);
 
     return (
@@ -125,63 +118,80 @@ export default function TableServerSide<T extends { id: string }>({
                         </tr>
                     );
                 })}
-                <tr>
-                    {loading ? (
-                        // Use our custom loading state to show a loading indicator
-                        <td colSpan={100}>Chargement...</td>
-                    ) : (
-                        <td colSpan={100}>
-                            Afficher {page.length} sur ~ {controlledPageCount * pageSize}{" "} résultats
-                        </td>
-                    )}
-                </tr>
                 </tbody>
-                {/*<tfoot>*/}
-                {/*    <tr>*/}
-                {/*        */}
-                {/*    </tr>*/}
-                {/*</tfoot>*/}
+                <tfoot>
+                    <tr className={footerData.rowStyle}>
+                        {
+                            footerData.data.map((footerCell:any, key:number) => {
+                                return <td key={key} className={footerData.colStyle}>{footerCell}</td>
+                            })
+                        }
+                    </tr>
+                </tfoot>
             </table>
-            <div className="w-full left mt-4 p-2" >
-                <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-                    {"<<"}
-                </button>{" "}
-                <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-                    {"<"}
-                </button>{" "}
-                <button onClick={() => nextPage()} disabled={!canNextPage}>
-                    {">"}
-                </button>{" "}
-                <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
-                    {">>"}
-                </button>{" "}
-                <span>Page{" "}<strong>{pageIndex + 1} of {pageOptions.length}</strong>{" "}</span>
-                <span> | Go to page:{" "}
-                    <input
-                        type="number"
-                        defaultValue={pageIndex + 1}
-                        onChange={(e) => {
-                            const page = e.target.value ? Number(e.target.value) - 1 : 0;
-                            gotoPage(page);
-                        }}
-                        max={pageOptions.length}
-                        min={0}
-                        style={{ width: "100px" }}
-                    />
+            <div>
+                {/*Use our custom loading state to show a loading indicator*/}
+                <span className={'w-full bg-blue-50 text-sm p-1'}>
+                    {
+                        loading ? (
+                            `Chargement...`
+                        ) : (
+                            `Afficher ${page.length} sur ~ ${controlledPageCount * pageSize} résultats`
+                        )
+                    }
                 </span>
-                {" "}
-                <select className={"float-right p-1 border-2 border-gray-900"}
-                    value={pageSize}
-                    onChange={(e) => {
-                        setPageSize(Number(e.target.value));
-                    }}>
-                    {[10, 20, 30, 40, 50].map((pageSize) => (
-                        <option key={pageSize} value={pageSize}>
-                            Afficher {pageSize}
-                        </option>
-                    ))}
-                </select>
             </div>
+            {
+                withPagination
+                    ? <div className={styles.paginationBox}>
+                            <div className={styles.paginationInfo}>
+                                <span>Page{" "}<strong>{pageIndex + 1} sur {pageOptions.length}</strong>{" "}</span>
+                                <span> | Aller à la page :{" "}
+                                    <input type="number" defaultValue={pageIndex + 1}
+                                           onChange={(e) => {
+                                               const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                                               gotoPage(page);
+                                           }}
+                                           max={pageOptions.length} min={0} className={styles.paginationIndexPage} /*style={{ width: "100px" }}*/
+                                    />
+                    </span>
+                            </div>
+                            <div className={styles.paginationNavigation}>
+                                <div className="flex text-gray-700">
+                                    <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}
+                                            className={styles.buttonsStyle}>
+                                        <MdFirstPage className={styles.iconSize}/>
+                                    </button>
+                                    <button onClick={() => previousPage()} disabled={!canPreviousPage}
+                                            className={styles.buttonsStyle}>
+                                        <MdChevronLeft className={styles.iconSize}/>
+                                    </button>
+                                    <button onClick={() => nextPage()} disabled={!canNextPage}
+                                            className={styles.buttonsStyle}>
+                                        <MdChevronRight className={styles.iconSize}/>
+                                    </button>
+                                    <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}
+                                            className={styles.buttonsStyle} >
+                                        <MdLastPage className={styles.iconSize}/>
+                                    </button>
+                                </div>
+                            </div>
+                            <div className={styles.paginationNumberRows}>
+                                <select className={styles.paginationNumberRowsSelect}
+                                        value={pageSize}
+                                        onChange={(e) => {
+                                            setPageSize(Number(e.target.value));
+                                        }}>
+                                    {(rowPerPage).map((pageSize) => (
+                                        <option key={pageSize} value={pageSize}>
+                                            Afficher {pageSize}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    : null
+            }
         </>
     );
 }
