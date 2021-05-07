@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {createRef, useRef, useState} from "react";
 import makeData from "./makeData";
 import TableServerSide from './Table'
 
@@ -13,31 +13,24 @@ const endPoitUrl = 'https://api.instantwebtools.net/v1/passenger'
 const handleEndPoit = (pageSize = 20, pageIndex = 0, sortBy = '[]') => {
     fetch(`${endPoitUrl}?page=${pageIndex}&size=${pageSize}`)
         .then(response => response.json())
-        .then(data =>
-            console.log(data) // here I get 500000 items
-        )
+        .then(data => console.log(data)) // here I get 500000 items
 }
 
 export default function AppServerSide() {
 
 
     const [data, setData] = useState([]);
-    const [footerData, setFooterData] = useState({
-        rowStyle: 'bg-blue-300 text-sm font-bold',
-        colStyle: 'p-2',
-        data: [<span className={'text-white'}>Total</span>, '-', '-', '-', '-', '-', '1000€', '500€', '800€', '1200€', '300€']
-    });
+    const [totalRowData, setTotalRowData]= useState(undefined);
     const [loading, setLoading] = React.useState(false);
     const [pageCount, setPageCount] = React.useState(0);
     const fetchIdRef = React.useRef(0);
-    const sortIdRef = React.useRef(0);
+    const tableRef = useRef();
+    ;
 
-    interface Data {
-        firstname: string,
-        lastname: string,
-        age: number
-    }
 
+    /**
+    * Table columns
+    */
     const columns =
         React.useMemo(() =>
             [
@@ -129,9 +122,7 @@ export default function AppServerSide() {
      * OnRowClick Function
      * @param row
      */
-    function handleRowClick(row: any){
-        console.log(row)
-    }
+    const handleRowClick = ((row: any) => { console.log(row) })
 
     /**
      * Fetch Data
@@ -143,8 +134,14 @@ export default function AppServerSide() {
 
 
         console.log(`withPagination : ${withPagination} page size : ${pageSize}, pageIndex : ${pageIndex} et SortedBy : ${sortBy}`)
-        // console.log(sortBy)
         // handleEndPoit(pageSize, pageIndex, sortBy)
+
+        // update totalRowData
+        setTotalRowData(   {
+            rowStyle: 'bg-blue-300 text-sm font-bold',
+            colStyle: 'p-2',
+            data: [<span className={'text-white'}>Total</span>, '-', '-', '-', '-', '-', '1000€', '500€', '800€', '1200€', '300€']
+        });
 
         // Give this fetch an ID
         const fetchId = ++fetchIdRef.current;
@@ -190,14 +187,14 @@ export default function AppServerSide() {
     return (
         <React.Fragment>
             <TableServerSide
-                // ref={sortIdRef}
+                tableRef={tableRef}
                 columns={columns}
                 data={data}
                 fetchData={fetchData}
                 loading={loading}
                 pageCount={pageCount}
                 // withPagination={false}
-                footerData={footerData}
+                totalRowData={totalRowData}
                 rowPerPage={[25, 50, 100]}
                 handleRowClick={handleRowClick}
                 manual // informs React Table that you'll be handling sorting and pagination server-side
