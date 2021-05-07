@@ -30,7 +30,7 @@ const newPerson = () => {
     }
 }
 
-export default function makeData(len = 5553) {
+export default function makeData(len = 5000) {
     return range(len).map(d => {
         return {
             ...newPerson(),
