@@ -1,6 +1,14 @@
 import React, {createRef, ReactElement, useEffect} from 'react'
 // import { MdKeyboardArrowUp, MdKeyboardArrowDown, } from 'react-icons/md'
-import { MdArrowDropUp, MdArrowDropDown, MdFirstPage, MdLastPage, MdChevronLeft, MdChevronRight } from "react-icons/md"
+import {
+    MdArrowDropUp,
+    MdArrowDropDown,
+    MdFirstPage,
+    MdLastPage,
+    MdChevronLeft,
+    MdChevronRight,
+    MdAddCircleOutline, MdSave
+} from "react-icons/md"
 import {Column, usePagination, useSortBy, useTable} from "react-table";
 import { styles } from './TableStyles'
 
@@ -11,18 +19,23 @@ type totalRowDataType = {
 }
 
 interface TableProps<T extends object> {
-    tableRef: any;
-    columns: Column<T>[];
-    data?: T[];
+    tableRef: any
+    columns: Column<T>[]
+    data?: T[]
+    addNewRow?:any
+    fetchData?:any
+    loading?:boolean
+    withPagination?:boolean
+    pageCount?: any
+    rowPerPage?: number[]
+    totalRowData?: totalRowDataType
+    handleRowClick?: any
+    manual?:any
 
-    fetchData?:any,
-    loading?:boolean,
-    withPagination?:boolean,
-    pageCount?: any,
-    rowPerPage?: number[],
-    totalRowData?: totalRowDataType,
-    handleRowClick?: any,
-    manual?:any,
+    onAddRowClick?:any
+    onSaveData?:any
+    addRowData?:any[]
+    onRowDelte?: any
 }
 
 export default function TableServerSide<T extends { id: string }>(props: TableProps<T>): ReactElement {
@@ -38,6 +51,11 @@ export default function TableServerSide<T extends { id: string }>(props: TablePr
         rowPerPage = [10, 20, 30, 40, 50],
         handleRowClick,
         totalRowData = {rowStyle: '', colStyle: '', data: []},
+        addNewRow,
+        onAddRowClick,
+        onSaveData,
+        addRowData,
+        onRowDelte,
     } = props;
 
     const {
@@ -126,6 +144,11 @@ export default function TableServerSide<T extends { id: string }>(props: TablePr
                         </tr>
                     );
                 })}
+                {
+                Object.keys(addRowData).map((valueOfKey, key) => {
+                    return (addRowData[key])
+                })
+                }
                 </tbody>
                 <tfoot>
                 {
@@ -139,16 +162,20 @@ export default function TableServerSide<T extends { id: string }>(props: TablePr
                         </tr>)
                         : null
                 }
-                <tr>
-                    {/*Use our custom loading state to show a loading indicator*/}
-                    <td colSpan={100} className={'w-full bg-blue-50 text-sm p-1'}>
-                        {
-                            loading ? (
-                                <strong>`Chargement...`</strong>
-                            ) : (<span>Afficher <strong>{page.length} sur {controlledPageCount * pageSize}</strong> résultats</span>)
-                        }
-                    </td>
-                </tr>
+                {
+                    withPagination
+                        ? (<tr>
+                                {/*Use our custom loading state to show a loading indicator*/}
+                                <td colSpan={100} className={'w-full bg-blue-50 text-sm p-1'}>
+                                    {
+                                        loading ? (
+                                            <strong>`Chargement...`</strong>
+                                        ) : (<span>Afficher <strong>{page.length} sur {controlledPageCount * pageSize}</strong> résultats</span>)
+                                    }
+                                </td>
+                           </tr>)
+                        : null
+                }
                 </tfoot>
             </table>
             {
@@ -203,6 +230,16 @@ export default function TableServerSide<T extends { id: string }>(props: TablePr
                     </div>
                     : null
             }
+            <div className={'float-right'}>
+                <button onClick={onAddRowClick}
+                        className="bg-blue-500 hover:bg-green-600 text-white text-sm font-bold py-1 px-2 rounded mt-2">
+                    <MdAddCircleOutline className={'text-xl'} />
+                </button>
+                <button onClick={onSaveData}
+                        className="bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-1 px-2 rounded mt-2 ml-2">
+                    <MdSave className={'text-xl'} />
+                </button>
+            </div>
         </>
     );
 }

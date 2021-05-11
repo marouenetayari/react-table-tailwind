@@ -1,8 +1,10 @@
 import React, {createRef, useRef, useState} from "react";
 import makeData from "./makeData";
 import TableServerSide from './Table'
+import {styles} from "./TableStyles";
+import {MdAddCircleOutline, MdDelete, MdLastPage, MdSave} from "react-icons/md";
 
-const serverData = makeData(500);
+const serverData = makeData(3);
 const endPoitUrl = 'https://api.instantwebtools.net/v1/passenger'
 /**
  * Call EndPoint handler
@@ -18,21 +20,74 @@ const handleEndPoit = (pageSize = 20, pageIndex = 0, sortBy = '[]') => {
 
 export default function AppServerSide() {
 
-
+    // const [addRowData, setAddRowData] = useState([addNewRow]);
+    const [addRowData, setAddRowData] = useState([]);
     const [data, setData] = useState([]);
     const [totalRowData, setTotalRowData]= useState(undefined);
     const [loading, setLoading] = React.useState(false);
     const [pageCount, setPageCount] = React.useState(0);
     const fetchIdRef = React.useRef(0);
     const tableRef = useRef();
-    ;
+    const [rowdata, setRowData] = useState([]);
 
+
+    // handle input change
+    // const handleInputChange = (e:any, index:number) => {
+    //     const { name, value } = e.target;
+    //     const list = [...inputList];
+    //     list[index][name] = value;
+    //     setInputList(list);
+    // };
+
+    const handleChange = (event: any, key: number) =>  {
+        const { name, value } = event.target
+        const addRowData = this.state.addRowData[key]
+        addRowData[name] = value
+        this.setScale(addRowData)
+    }
+
+    /**
+     * Add new row template
+     */
+    const addNewRow = (rows:any, key:number) => {
+
+        return (
+                <tr className={styles.addRowTR}>
+                    <td className={styles.addRowTD}><input className={styles.addRowInput} type={'text'} name={'firstName'} /></td>
+                    <td className={styles.addRowTD}><input className={styles.addRowInput} type={'text'} name={'lastName'} /></td>
+                    <td className={styles.addRowTD}><input className={styles.addRowInput} type={'number'} name={'age'} /></td>
+                    <td className={styles.addRowTD}><input className={styles.addRowInput} type={'email'}/></td>
+                    <td className={styles.addRowTD}><input className={styles.addRowInput} type={'number'}/></td>
+                    <td className={styles.addRowTD}><input className={styles.addRowInput} type={'month'}/></td>
+                    <td className={styles.addRowTD}><input className={styles.addRowInput} type={'range'}/></td>
+                    <td className={styles.addRowTD}><input className={styles.addRowInput} type={'search'}/></td>
+                    <td className={styles.addRowTD}><input className={styles.addRowInput} type={'tel'}/></td>
+                    <td className={styles.addRowTD}><input className={styles.addRowInput} type={'time'}/></td>
+                    <td className={styles.addRowTD}><input className={styles.addRowInput} type={'url'}/></td>
+                    <td className={styles.addRowTD}>
+                        <button onClick={() => onRowDelte} className="bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-1 px-2 rounded mt-2">
+                            <MdDelete className={'text-xl'} />
+                        </button>
+                    </td>
+                </tr>
+            )
+    };
+
+    /**
+     * Add new row Talbe
+     */
+    const onAddRowClick = () => {
+        const data = {...addRowData}
+
+        const key = Object.keys(data).length
+        data[key] = addNewRow(data, (key > 0) ? key-1 : 0)
+        setAddRowData(data);
+    };
 
     /**
     * Table columns
     */
-    const columns =
-        React.useMemo(() =>
+    const columns = React.useMemo(() =>
             [
                 {
                     Header: "First Name",
@@ -114,7 +169,21 @@ export default function AppServerSide() {
                     width: 50,
                     // minWid: 50,
                     // align: 'right',
-                }
+                },
+                {
+                    Width: 200,
+                    Header: "Action",
+                    id: 'edit',
+                    accessor: '[col_5]',
+                    disableSortBy: true,
+                    Cell: () => (
+                        <button onClick={() => onRowDelte} className="bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-1 px-2 rounded mt-2">
+                            <MdDelete className={'text-xl'} />
+                        </button>
+                    )
+
+                    // render: ({ row }) => (<button onClick={(e) => this.handleButtonClick(e, row)}>Click Me</button>)
+                },
             ]
 ,[])
 
@@ -184,6 +253,18 @@ export default function AppServerSide() {
         }, 100);
     }, []);
 
+
+    const onRowDelte = () => {
+        console.log("Row delete");
+    };
+
+    const onSaveData = async () => {
+        console.log("Save data");
+        setAddRowData([]);
+    };
+
+
+
     return (
         <React.Fragment>
             <TableServerSide
@@ -192,9 +273,17 @@ export default function AppServerSide() {
                 data={data}
                 fetchData={fetchData}
                 loading={loading}
+
+                onAddRowClick={onAddRowClick}
+                onSaveData={onSaveData}
+                addRowData={addRowData}
+                onRowDelte={onRowDelte}
+
                 pageCount={pageCount}
-                // withPagination={false}
-                totalRowData={totalRowData}
+
+                withPagination={false}
+                // totalRowData={totalRowData}
+
                 rowPerPage={[25, 50, 100]}
                 handleRowClick={handleRowClick}
                 manual // informs React Table that you'll be handling sorting and pagination server-side
