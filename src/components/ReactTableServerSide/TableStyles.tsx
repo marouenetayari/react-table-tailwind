@@ -1,11 +1,12 @@
 // Tailwind styles Table
 export const styles = {
-        tableTable: 'table-auto block overflow-auto w-full h-auto border border-gray-700 block w-full overflow-x-auto overflow-y-hidden border-b-1',
-        tableHeadRow: 'w-full outline-none relative font-medium leading-6 align-middle bg-blue-50 color-gray-200 border-b-1 border-gray-700 hover:opacity-100 ',
-        tableHeadCell : 'text-sm left text-left font-medium leading-6 border-blue-200 p-3 border-b-2 border-solid border-gray-700 hover:bg-gray-200 last:border-r-0 ',
-        tableSortLabel : 'inline-grid ',
-        tableRow : 'outline-none align-middle border-b-2 border-solid border-gray-200 hover:bg-gray-200 last:border-b-0',
-        tableCell : 'p-2 text-sm text-center leading-4 border-2 border-solid border-gray-200 align-middle last:border-r-0 ',
+        tableSortLabel : 'absolute ',
+        tableTable: 'table-auto table h-auto w-full overflow-x-scroll',
+        tableHead:'bg-blue-100',
+        tableHeadRow: 'w-full border border-solid border-primary-lighter border-b-0 border-primary-lighter font-medium leading-6 align-middle bg-blue-100',
+        tableHeadCell : 'text-base text-left font-medium leading-6 color-gray-700 p-3 last:bg-red relative',
+        tableRow : 'align-middle border border-solid border-primary-lighter border-t-0  hover:bg-gray-200 ',
+        tableCell : 'p-3 text-base text-left leading-4 align-middle',
         tableBody : ' ',
         styleHeaderCheckbox : 'text-base -mt-2 mr-0 -mb-2 -ml-4 p-2 hover:bg-transparent',
         styleCheckbox : 'text-base hover:bg-transparent',
@@ -23,7 +24,10 @@ export const styles = {
         // Add New Row Styles
         addRowTR: 'bg-green-100 outline-none align-middle border-b-2 border-solid border-green-200 hover:bg-green-200 last:border-b-0',
         addRowTD: 'p-2 text-lg text-center leading-4 border-2 border-solid border-gray-200 align-middle last:border-r-0',
-        addRowInput: 'rounded-lg'
+        addRowInput: 'rounded-lg',
+
+
+
 
 
 }
