@@ -4,7 +4,7 @@ import TableServerSide from './Table'
 import {styles} from "./TableStyles";
 import {MdAddCircleOutline, MdDelete, MdLastPage, MdSave} from "react-icons/md";
 
-const serverData = makeData(3);
+const serverData = makeData(5);
 const endPoitUrl = 'https://api.instantwebtools.net/v1/passenger'
 /**
  * Call EndPoint handler
@@ -243,7 +243,6 @@ export default function AppServerSide() {
                             .slice(startRow, endRow)
                     );
                 }
-
                 // Your server could send back total page count.
                 // For now we'll just fake it, too
                 setPageCount(Math.ceil(serverData.length / pageSize));
@@ -251,8 +250,8 @@ export default function AppServerSide() {
                 setLoading(false);
             }
         }, 100);
+        console.log(data)
     }, []);
-
 
     const onRowDelte = () => {
         console.log("Row delete");
@@ -262,8 +261,6 @@ export default function AppServerSide() {
         console.log("Save data");
         setAddRowData([]);
     };
-
-
 
     return (
         <React.Fragment>
@@ -281,7 +278,7 @@ export default function AppServerSide() {
 
                 pageCount={pageCount}
 
-                withPagination={false}
+                withPagination={true}
                 // totalRowData={totalRowData}
 
                 rowPerPage={[25, 50, 100]}

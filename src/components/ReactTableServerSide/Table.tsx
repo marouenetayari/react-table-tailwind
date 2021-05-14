@@ -1,5 +1,8 @@
 import React, {createRef, ReactElement, useEffect} from 'react'
 // import { MdKeyboardArrowUp, MdKeyboardArrowDown, } from 'react-icons/md'
+import SimpleBar from 'simplebar-react';
+import 'simplebar/dist/simplebar.css';
+
 import {
     MdArrowDropUp,
     MdArrowDropDown,
@@ -10,7 +13,7 @@ import {
     MdAddCircleOutline, MdSave
 } from "react-icons/md"
 import {Column, usePagination, useSortBy, useTable} from "react-table";
-import { styles } from './TableStyles'
+import {styles} from './TableStyles'
 
 type totalRowDataType = {
     rowStyle: string,
@@ -22,19 +25,19 @@ interface TableProps<T extends object> {
     tableRef: any
     columns: Column<T>[]
     data?: T[]
-    addNewRow?:any
-    fetchData?:any
-    loading?:boolean
-    withPagination?:boolean
+    addNewRow?: any
+    fetchData?: any
+    loading?: boolean
+    withPagination?: boolean
     pageCount?: any
     rowPerPage?: number[]
     totalRowData?: totalRowDataType
     handleRowClick?: any
-    manual?:any
+    manual?: any
 
-    onAddRowClick?:any
-    onSaveData?:any
-    addRowData?:any[]
+    onAddRowClick?: any
+    onSaveData?: any
+    addRowData?: any[]
     onRowDelte?: any
 }
 
@@ -72,12 +75,12 @@ export default function TableServerSide<T extends { id: string }>(props: TablePr
         nextPage,
         previousPage,
         setPageSize,
-        state: { pageIndex, pageSize, sortBy }
+        state: {pageIndex, pageSize, sortBy}
     } = useTable<T>(
         {
             columns,
             data,
-            initialState: { pageIndex: 0 }, // Pass our hoisted table state
+            initialState: {pageIndex: 0}, // Pass our hoisted table state
             manualPagination: true, // Tell the usePagination
             // hook that we'll handle our own data fetching
             // This means we'll also have to provide our own
@@ -88,96 +91,104 @@ export default function TableServerSide<T extends { id: string }>(props: TablePr
             // autoResetPage: false,
             // autoResetSortBy: false,
             autoResetHiddenColumns: true,
-            autoResetSortBy:true,
+            autoResetSortBy: true,
         },
         useSortBy,
         usePagination
     );
 
     useEffect(() => {
-        fetchData({ pageIndex, pageSize, sortBy, withPagination });
+        fetchData({pageIndex, pageSize, sortBy, withPagination});
     }, [sortBy, fetchData, pageIndex, pageSize]);
 
     return (
-        <>
-            <table className={styles.tableTable} {...getTableProps()} ref={tableRef}>
-                <thead>
-                {headerGroups.map((headerGroup) => (
-                    <tr className={styles.tableHeadRow} {...headerGroup.getHeaderGroupProps()}>
-                        {headerGroup.headers.map((column) => (
-                            // Add the sorting props to control sorting. For this example
-                            // we can add them into the header props
-                            <th className={styles.tableHeadCell}
-                                {...column.getHeaderProps(column.getSortByToggleProps())}>
-                                {column.render("Header")}
-                                {/* Add a sort direction indicator */}
-                                {
-                                    (!column.disableSortBy)
-                                        ? (column.isSorted)
-                                        ? column.isSortedDesc
-                                            ? <span className={styles.tableSortLabel}><MdArrowDropUp
-                                                className={'text-lg opacity-50'}/><MdArrowDropDown
-                                                className={'-mt-3 text-lg'}/></span>
-                                            : <span className={styles.tableSortLabel}><MdArrowDropUp
-                                                className={'text-lg'}/><MdArrowDropDown
-                                                className={'-mt-3 text-lg opacity-50'}/></span>
-                                        : <span className={styles.tableSortLabel}><MdArrowDropUp
-                                            className={'text-lg opacity-50'}/><MdArrowDropDown
-                                            className={'-mt-3 text-lg opacity-50'}/></span>
-                                        : null
-                                }
-                            </th>
+        <React.Fragment>
+            <SimpleBar autoHide={true}>
+                <table className={styles.tableTable} {...getTableProps()} ref={tableRef}>
+                        <thead>
+                        {headerGroups.map((headerGroup) => (
+                            <tr className={styles.tableHeadRow} {...headerGroup.getHeaderGroupProps()}>
+                                {headerGroup.headers.map((column) => (
+                                    // Add the sorting props to control sorting. For this example
+                                    // we can add them into the header props
+                                    <th className={styles.tableHeadCell}
+                                        {...column.getHeaderProps(column.getSortByToggleProps())}>
+                                        {column.render("Header")}
+                                        {/* Add a sort direction indicator */}
+                                        {
+                                            (!column.disableSortBy)
+                                                ? (column.isSorted)
+                                                ? column.isSortedDesc
+                                                    ? <span className={styles.tableSortLabel}>
+                                                        <MdArrowDropUp
+                                                            className={'text-lg opacity-50'}/>
+                                                        <MdArrowDropDown
+                                                            className={'-mt-3 text-lg'}/>
+                                                        </span>
+                                                    : <span className={styles.tableSortLabel}>
+                                                        <MdArrowDropUp
+                                                            className={'text-lg'}/>
+                                                        <MdArrowDropDown
+                                                            className={'-mt-3 text-lg opacity-50'}/>
+                                                    </span>
+                                                : <span className={styles.tableSortLabel}><MdArrowDropUp
+                                                    className={'text-lg opacity-50'}/><MdArrowDropDown
+                                                    className={'-mt-3 text-lg opacity-50'}/></span>
+                                                : null
+                                        }
+                                    </th>
+                                ))}
+                            </tr>
                         ))}
-                    </tr>
-                ))}
-                </thead>
-                <tbody className={styles.tableBody} {...getTableBodyProps()}>
-                {page.map((row, i) => {
-                    prepareRow(row);
-                    return (
-                        <tr className={styles.tableRow} {...row.getRowProps()} onClick={() => handleRowClick(row)}>
-                            {row.cells.map((cell) => {
-                                return (
-                                    <td className={styles.tableCell} {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                                );
-                            })}
-                        </tr>
-                    );
-                })}
-                {
-                Object.keys(addRowData).map((valueOfKey, key) => {
-                    return (addRowData[key])
-                })
-                }
-                </tbody>
-                <tfoot>
-                {
-                    (totalRowData.data.length > 0)
-                        ? (<tr className={totalRowData.rowStyle}>
-                            {
-                                totalRowData.data.map((footerCell: any, key: number) => {
-                                    return <td key={key} className={totalRowData.colStyle}>{footerCell}</td>
-                                })
-                            }
-                        </tr>)
-                        : null
-                }
-                {
-                    withPagination
-                        ? (<tr>
-                                {/*Use our custom loading state to show a loading indicator*/}
-                                <td colSpan={100} className={'w-full bg-blue-50 text-sm p-1'}>
+                        </thead>
+                        <tbody className={styles.tableBody} {...getTableBodyProps()}>
+                        {page.map((row, i) => {
+                            prepareRow(row);
+                            return (
+                                <tr className={styles.tableRow} {...row.getRowProps()} onClick={() => handleRowClick(row)}>
+                                    {row.cells.map((cell) => {
+                                        return (
+                                            <td className={styles.tableCell} {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                                        );
+                                    })}
+                                </tr>
+                            );
+                        })}
+                        {
+                            Object.keys(addRowData).map((valueOfKey, key) => {
+                                return (addRowData[key])
+                            })
+                        }
+                        </tbody>
+                        <tfoot>
+                        {
+                            (totalRowData.data.length > 0)
+                                ? (<tr className={totalRowData.rowStyle}>
                                     {
-                                        loading ? (
-                                            <strong>`Chargement...`</strong>
-                                        ) : (<span>Afficher <strong>{page.length} sur {controlledPageCount * pageSize}</strong> résultats</span>)
+                                        totalRowData.data.map((footerCell: any, key: number) => {
+                                            return <td key={key} className={totalRowData.colStyle}>{footerCell}</td>
+                                        })
                                     }
-                                </td>
-                           </tr>)
-                        : null
-                }
-                </tfoot>
-            </table>
+                                </tr>)
+                                : null
+                        }
+                        {
+                            withPagination
+                                ? (<tr>
+                                    {/*Use our custom loading state to show a loading indicator*/}
+                                    <td colSpan={100} className={'w-full bg-blue-50 text-sm p-1 pb-2'}>
+                                        {
+                                            loading ? (
+                                                <strong>`Chargement...`</strong>
+                                            ) : (<span>Afficher <strong>{page.length} sur {controlledPageCount * pageSize}</strong> résultats</span>)
+                                        }
+                                    </td>
+                                </tr>)
+                                : null
+                        }
+                        </tfoot>
+                </table>
+            </SimpleBar>
             {
                 withPagination
                     ? <div className={styles.paginationBox}>
@@ -192,7 +203,7 @@ export default function TableServerSide<T extends { id: string }>(props: TablePr
                                        max={pageOptions.length} min={0}
                                        className={styles.paginationIndexPage} /*style={{ width: "100px" }}*/
                                 />
-                    </span>
+                            </span>
                         </div>
                         <div className={styles.paginationNavigation}>
                             <div className="flex text-gray-700">
@@ -231,15 +242,18 @@ export default function TableServerSide<T extends { id: string }>(props: TablePr
                     : null
             }
             <div className={'float-right'}>
-                <button onClick={onAddRowClick}
-                        className="bg-blue-500 hover:bg-green-600 text-white text-sm font-bold py-1 px-2 rounded mt-2">
-                    <MdAddCircleOutline className={'text-xl'} />
-                </button>
-                <button onClick={onSaveData}
-                        className="bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-1 px-2 rounded mt-2 ml-2">
-                    <MdSave className={'text-xl'} />
-                </button>
-            </div>
-        </>
+                    <button onClick={onAddRowClick}
+                            className="bg-blue-500 hover:bg-green-600 text-white text-sm font-bold py-1 px-2 rounded mt-2">
+                        <MdAddCircleOutline className={'text-xl'}/>
+                    </button>
+                    <button onClick={onSaveData}
+                            className="bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-1 px-2 rounded mt-2 ml-2">
+                        <MdSave className={'text-xl'}/>
+                    </button>
+                </div>
+
+
+        </React.Fragment>
+
     );
 }

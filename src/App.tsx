@@ -1,5 +1,6 @@
 import * as React from 'react'
 import AppServerSide from './components/ReactTableServerSide/App'
+import AppBasic from "./components/ReactTableServerSide/AppBasic";
 
 export default function App() {
     const pageName = "React Table";
@@ -54,6 +55,7 @@ export default function App() {
                     </nav>
                     {/* Content */}
                     <div className="px-4 mx-auto w-full">
+                        {/* AppFullTable */}
                         <div className="flex flex-wrap">
                             <div className="w-full">
                                 {/* Page content */}
@@ -61,6 +63,19 @@ export default function App() {
                                     <div className="w-full rounded bg-white mb-2 p-6 break-words shadow-lg">
                                         <div className='App'>
                                             <AppServerSide />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {/* AppBasicTable */}
+                        <div className="flex flex-wrap">
+                            <div className="w-full">
+                                {/* Page content */}
+                                <div className="flex flex-wrap">
+                                    <div className="w-full rounded bg-white mb-2 p-6 break-words shadow-lg">
+                                        <div className='App'>
+                                            <AppBasic />
                                         </div>
                                     </div>
                                 </div>

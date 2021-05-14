@@ -11,6 +11,7 @@ const range = (len:number) => {
 const newPerson = () => {
     const statusChance = Math.random()
     return {
+        id: Math.floor(Math.random() * 100),
         firstName: namor.generate({ words: 1, numbers: 0 }),
         lastName: namor.generate({ words: 1, numbers: 0 }),
         age: Math.floor(Math.random() * 100),
@@ -34,7 +35,7 @@ export default function makeData(len = 5000) {
     return range(len).map(d => {
         return {
             ...newPerson(),
-            children: range(10).map(newPerson)
+            // children: range(10).map(newPerson)
         };
     });
 }
